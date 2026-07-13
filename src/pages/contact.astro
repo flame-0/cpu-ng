@@ -1,0 +1,31 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { settings } from '../lib/settings';
+---
+
+<Layout title="Contact" description="Get in touch with the Computer Professionals' Union.">
+    <div class="mx-auto max-w-3xl px-4 pt-28 pb-16 sm:px-6">
+        <h1 class="text-3xl font-bold">Contact</h1>
+        <div class="mt-8 space-y-6 text-(--fg-secondary) leading-relaxed">
+            <p>The Computer Professionals&rsquo; Union is always open to inquiries from ICT workers, students, partner organizations, and members of the press.</p>
+            <div class="mt-8 space-y-4">
+                <div>
+                    <h3 class="text-sm font-bold text-(--fg)">Email</h3>
+                    <p><a href={`mailto:${settings.social_links.email}`} class="text-(--accent) hover:text-(--accent-hover) transition-colors">{settings.social_links.email}</a></p>
+                </div>
+                {settings.social_links.twitter && (
+                    <div>
+                        <h3 class="text-sm font-bold text-(--fg)">Twitter</h3>
+                        <p><a href={settings.social_links.twitter} target="_blank" rel="noopener noreferrer" class="text-(--accent) hover:text-(--accent-hover) transition-colors">{settings.social_links.twitter}</a></p>
+                    </div>
+                )}
+                {settings.social_links.facebook && (
+                    <div>
+                        <h3 class="text-sm font-bold text-(--fg)">Facebook</h3>
+                        <p><a href={settings.social_links.facebook} target="_blank" rel="noopener noreferrer" class="text-(--accent) hover:text-(--accent-hover) transition-colors">{settings.social_links.facebook}</a></p>
+                    </div>
+                )}
+            </div>
+        </div>
+    </div>
+</Layout>

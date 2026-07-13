@@ -1,0 +1,33 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import { slugify } from '../../lib/slug';
+import PostCard from '../../components/posts/PostCard.astro';
+
+export async function getStaticPaths() {
+    const posts = await getCollection('posts');
+    const published = posts.filter(p => p.data.published);
+    const cats = new Map<string, { slug: string; name: string }>();
+    for (const p of published) for (const c of p.data.categories) {
+        const s = slugify(c);
+        if (!cats.has(s)) cats.set(s, { slug: s, name: c });
+    }
+    return [...cats.values()].map(cat => ({
+        params: { slug: cat.slug },
+        props: { name: cat.name, posts: published.filter(p => p.data.categories.some(c => slugify(c) === cat.slug)) },
+    }));
+}
+
+const { name, posts } = Astro.props;
+---
+
+<Layout title={`Category: ${name}`} description={`Posts in the ${name} category.`}>
+    <div class="mx-auto max-w-4xl px-4 pt-28 pb-16 sm:px-6">
+        <h1 class="text-3xl font-bold">{name}</h1>
+        <p class="mt-2 text-(--fg-secondary)">{posts.length} {posts.length === 1 ? 'post' : 'posts'} in this category</p>
+        <div class="mt-10 space-y-6">{posts.map(post => <PostCard post={post} />)}</div>
+        <div class="mt-12 border-t border-(--border-light) pt-8">
+            <a href="/posts/" class="text-sm font-medium text-(--accent) hover:text-(--accent-hover) transition-colors">&larr; All posts</a>
+        </div>
+    </div>
+</Layout>

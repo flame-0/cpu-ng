@@ -1,0 +1,58 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import PostCard from '../../components/posts/PostCard.astro';
+import { Badge } from '../../components/ui/badge';
+import { slugify } from '../../lib/slug';
+
+export async function getStaticPaths() {
+    const all = await getCollection('posts');
+    const published = all.filter(p => p.data.published).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+    const perPage = 6;
+    const total = Math.max(1, Math.ceil(published.length / perPage));
+
+    // collect unique categories
+    const catSet = new Set<string>();
+    for (const p of published) for (const c of p.data.categories) catSet.add(c);
+    const categories = [...catSet].sort();
+
+    return Array.from({ length: total }, (_, i) => ({
+        params: { page: i === 0 ? undefined : String(i + 1) },
+        props: { posts: published.slice(i * perPage, (i + 1) * perPage), current: i + 1, total, categories },
+    }));
+}
+
+const { posts, current, total, categories } = Astro.props;
+---
+
+<Layout title="Posts" description="News, analysis, and resources from the Computer Professionals' Union.">
+    <div class="mx-auto max-w-4xl px-4 pt-28 pb-16 sm:px-6">
+        <h1 class="text-3xl font-bold">All posts</h1>
+        <p class="mt-2 text-(--fg-secondary)">News, analysis, and resources from CPU.</p>
+        {categories.length > 0 && (
+            <div class="mt-4 flex flex-wrap gap-2">
+                {categories.map(cat => (
+                    <a href={`/category/${slugify(cat)}`} class="hover:opacity-80 transition-opacity">
+                        <Badge variant="default">{cat}</Badge>
+                    </a>
+                ))}
+            </div>
+        )}
+        <div class="mt-10 space-y-6">
+            {posts.length === 0 ? (
+                <p class="py-12 text-center text-(--fg-muted)">No posts yet.</p>
+            ) : posts.map(post => <PostCard post={post} />)}
+        </div>
+        {total > 1 && (
+            <nav class="mt-12 grid grid-cols-3 items-center border-t border-(--border-light) pt-8" aria-label="Pagination">
+                <div class="text-left">
+                    {current > 1 ? <a href={current === 2 ? '/posts/' : `/posts/${current - 1}/`} class="text-sm font-medium text-(--accent) hover:text-(--accent-hover) transition-colors">&larr; Newer</a> : null}
+                </div>
+                <span class="text-sm text-(--fg-muted) text-center">Page {current} of {total}</span>
+                <div class="text-right">
+                    {current < total ? <a href={`/posts/${current + 1}/`} class="text-sm font-medium text-(--accent) hover:text-(--accent-hover) transition-colors">Older &rarr;</a> : null}
+                </div>
+            </nav>
+        )}
+    </div>
+</Layout>

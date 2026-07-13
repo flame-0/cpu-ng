@@ -1,0 +1,79 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { settings } from '../lib/settings';
+import { getCollection } from 'astro:content';
+import CpuLogo from '../components/shared/CpuLogo.astro';
+import PostCard from '../components/posts/PostCard.astro';
+import { Button } from '../components/ui/button';
+
+const allPosts = await getCollection('posts');
+const latestPosts = allPosts
+    .filter((p) => p.data.published)
+    .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+    .slice(0, 3);
+---
+
+<Layout description={settings.tagline}>
+    <!-- hero - big logo, strong statement -->
+    <section class="flex min-h-screen flex-col items-center justify-center px-4 text-center">
+        <div class="max-w-2xl animate-[fade-up_0.6s_ease-out]">
+            <div class="mb-8 flex justify-center text-(--accent)">
+                <CpuLogo size={96} />
+            </div>
+
+            <p class="text-sm font-bold tracking-widest uppercase text-(--fg-muted)">
+                Computer Professionals&rsquo; Union
+            </p>
+
+            <h1 class="mt-6 text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+                {settings.tagline}
+            </h1>
+
+            <p class="mt-5 text-lg text-(--fg-secondary) leading-relaxed max-w-xl mx-auto">
+                A mass organization of Filipino ICT professionals, students, and advocates building a people-centered digital future.
+            </p>
+
+            <div class="mt-10 flex flex-wrap items-center justify-center gap-3">
+                <a href="/posts/"><Button size="lg">Read our work</Button></a>
+                <a href="/about"><Button variant="secondary" size="lg">About CPU</Button></a>
+            </div>
+        </div>
+
+        <!-- subtle scroll hint -->
+        <div class="absolute bottom-8 animate-bounce text-(--fg-muted)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 5v14" /><path d="m19 12-7 7-7-7" />
+            </svg>
+        </div>
+    </section>
+
+    <!-- about -->
+    <section id="about" class="border-t border-(--border-light)">
+        <div class="mx-auto max-w-3xl px-4 py-24 sm:px-6">
+            <h2 class="text-2xl font-bold">About CPU</h2>
+            <div class="mt-6 space-y-4 text-(--fg-secondary) leading-relaxed">
+                {settings.about_text.split('\n\n').map((p) => <p>{p}</p>)}
+            </div>
+        </div>
+    </section>
+
+    <!-- latest posts -->
+    <section class="border-t border-(--border-light) py-24">
+        <div class="mx-auto max-w-5xl px-4 sm:px-6">
+            <div class="mb-10 flex items-end justify-between">
+                <h2 class="text-2xl font-bold">Latest updates</h2>
+                <a href="/posts/" class="text-sm font-medium text-(--accent) hover:text-(--accent-hover) transition-colors hidden sm:inline">View all &rarr;</a>
+            </div>
+            {latestPosts.length === 0 ? (
+                <p class="py-12 text-center text-(--fg-muted)">No posts yet.</p>
+            ) : (
+                <div class="grid gap-5 md:grid-cols-3">
+                    {latestPosts.map((post) => <PostCard post={post} />)}
+                </div>
+            )}
+            <div class="mt-6 text-center sm:hidden">
+                <a href="/posts/" class="text-sm font-medium text-(--accent) hover:text-(--accent-hover) transition-colors">View all &rarr;</a>
+            </div>
+        </div>
+    </section>
+</Layout>

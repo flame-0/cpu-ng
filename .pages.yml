@@ -1,0 +1,155 @@
+# pages cms configuration for the cpu website
+# see https://pagescms.org/docs for reference
+# this file lives at the repository root and is picked up by pages cms automatically
+
+# ---- media ----
+# images and files editable through pages cms
+media:
+  - name: images
+    label: Images
+    input: public/images
+    output: /images
+
+# ---- content collections ----
+content:
+
+  # --- posts collection ---
+  - name: posts
+    label: Posts
+    type: collection
+    path: src/content/posts
+    format: yaml-frontmatter
+    filename: "{primary}.md"
+    view:
+      primary: title
+      sort: [date]
+      default:
+        sort: date
+        order: desc
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+
+      - name: slug
+        label: Slug
+        type: string
+        description: "optional - leave empty to auto-generate from title"
+
+      - name: date
+        label: Date
+        type: date
+        required: true
+        options:
+          time: true
+          format: "yyyy-MM-dd'T'HH:mm"
+
+      - name: published
+        label: Published
+        type: boolean
+        default: false
+        description: "only published posts appear on the public site"
+
+      - name: excerpt
+        label: Excerpt
+        type: text
+        description: "a short summary shown in post cards and search results"
+
+      - name: featured_image
+        label: Featured Image
+        type: image
+        options:
+          media: images
+        description: "optional hero image shown on the post and social sharing cards"
+
+      - name: categories
+        label: Categories
+        type: string
+        list: true
+        pattern: ^[a-zA-Z0-9-]+$
+        description: "hyphenated categories (e.g. announcements, Analysis)"
+
+      - name: tags
+        label: Tags
+        type: string
+        list: true
+        pattern: ^[a-zA-Z0-9-]+$
+        description: "hyphenated tags (e.g. introduction, Digital-Sovereignty)"
+
+      - name: author
+        label: Author
+        type: string
+        required: true
+
+      - name: body
+        label: Body
+        type: rich-text
+        options:
+          format: markdown
+          media: images
+        description: "the post content - supports markdown with images from the media library"
+
+  # --- static pages collection ---
+  - name: pages
+    label: Static Pages
+    type: collection
+    path: src/content/pages
+    format: yaml-frontmatter
+    filename: "{primary}.md"
+    view:
+      primary: title
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+
+      - name: body
+        label: Body
+        type: rich-text
+        options:
+          format: markdown
+          media: images
+        description: "the page content - markdown with embedded images"
+
+  # --- site settings ---
+  - name: settings
+    label: Site Settings
+    type: file
+    path: src/data/settings.json
+    format: json
+    fields:
+      - name: site_title
+        label: Site Title
+        type: string
+        required: true
+
+      - name: tagline
+        label: Tagline
+        type: string
+        required: true
+
+      - name: about_text
+        label: About Text
+        type: text
+        description: "shown on the landing page about section - separate paragraphs with blank lines"
+
+      - name: social_links
+        label: Social Links
+        type: object
+        fields:
+          - name: twitter
+            label: Twitter URL
+            type: string
+          - name: facebook
+            label: Facebook URL
+            type: string
+          - name: email
+            label: Contact Email
+            type: string
+
+settings:
+  commit:
+    # attribute commits to the logged-in pages cms user when possible
+    identity: user

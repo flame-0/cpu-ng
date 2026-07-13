@@ -1,0 +1,49 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from '../ui/card';
+import { Badge } from '../ui/badge';
+import { slugify } from '../../lib/slug';
+
+export interface Props {
+    post: CollectionEntry<'posts'>;
+    showExcerpt?: boolean;
+}
+
+const { post, showExcerpt = true } = Astro.props;
+const { title, excerpt, date, categories, slug, featured_image } = post.data;
+const href = `/posts/${slug || slugify(title)}`;
+---
+
+<Card class="group transition-colors hover:border-(--border) overflow-hidden">
+    {featured_image && (
+        <a href={href}>
+            <img src={featured_image} alt={title} class="w-full h-48 object-cover border-b border-(--border-light)" />
+        </a>
+    )}
+    <CardHeader>
+        <div class="flex flex-wrap items-center gap-2 text-xs text-(--fg-muted)">
+            <time datetime={date.toISOString()}>
+                {date.toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' })}
+            </time>
+            {categories.length > 0 && <span aria-hidden="true">&middot;</span>}
+            {categories.slice(0, 2).map((cat) => (
+                <a href={`/category/${slugify(cat)}`}>
+                    <Badge variant="default">{cat}</Badge>
+                </a>
+            ))}
+        </div>
+        <CardTitle class="mt-1 text-lg">
+            <a href={href} class="text-(--fg) no-underline transition-colors hover:text-(--accent)">
+                {title}
+            </a>
+        </CardTitle>
+        {showExcerpt && excerpt && (
+            <CardDescription class="line-clamp-2">{excerpt}</CardDescription>
+        )}
+    </CardHeader>
+    <CardFooter>
+        <a href={href} class="text-sm font-medium text-(--accent) hover:text-(--accent-hover) transition-colors">
+            Read more &rarr;
+        </a>
+    </CardFooter>
+</Card>
